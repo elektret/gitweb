@@ -1,11 +1,18 @@
-## Keypair
-First, generate a keypair or copy your public key to the root
+## Gitweb & Docker
+This an example how to run [Gitweb](https://git.wiki.kernel.org/index.php/Gitweb) in a docker container.
+
+    git clone -b master https://github.com/elektret/gitweb.git gitweb
+    cd gitweb
+
+### Keypair
+First generate a keypair or copy your public key to the ssh
 directory and name it `gitweb_rsa`:
 
+    rm -f gitweb_rsa.pub
     ssh-keygen -t rsa -b 4096 -f gitweb_rsa -C 'user@localhost'
     cp -iv gitweb_rsa gitweb_rsa.pub ~/.ssh/
 
-## Tell git which key to use
+### Tell git which key to use
 In `~/.ssh/config`, add your key:
 
     cat >> ~/.ssh/config << EOF
@@ -15,22 +22,22 @@ In `~/.ssh/config`, add your key:
       IdentityFile ~/.ssh/gitweb_rsa
     EOF
 
-## Build & Run
+### Build & run
 
     docker build -t elektret/gitweb .
     docker run -dp 8080:80 -p 6060:22 --name some-gitweb elektret/gitweb
     
-## Web interface
+### Web interface
 Your web interface should be accessible through `http://localhost:8080/`.
     
-## Create a new remote repository
+### Create a new remote repository
 
     ssh -i gitweb_rsa gitweb@localhost -p 6060
     git init --bare repos/project.git
     echo "Hello World" > repos/project.git/description
     exit
 
-## Create a new local repository
+### Create a new local repository
 
     git init project.git
     cd project.git
