@@ -1,0 +1,14 @@
+server {
+  listen 80;
+  server_name localhost;
+  root /var/www/gitweb;
+  index gitweb.cgi;
+
+  location ~ \.cgi$ {
+    gzip off;
+    fastcgi_param SCRIPT_FILENAME /var/www/gitweb/gitweb.cgi;
+    fastcgi_param GITWEB_CONFIG /etc/gitweb.conf;
+    include fastcgi_params;
+    fastcgi_pass unix://var/run/fcgiwrap.socket;
+  }
+}
