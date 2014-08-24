@@ -101,7 +101,6 @@ RUN cat /home/gitweb/.ssh/gitweb_rsa.pub > /home/gitweb/.ssh/authorized_keys; \
 ADD nginx.conf /etc/nginx/nginx.conf
 ADD gitweb.conf /etc/gitweb.conf
 ADD sshd.conf /etc/ssh/sshd_config
-RUN echo 'root:screencast' | chpasswd
 
 RUN chmod 644 /etc/gitweb.conf
 
