@@ -5,7 +5,7 @@ This an example how to run [Gitweb](https://git.wiki.kernel.org/index.php/Gitweb
     cd gitweb
 
 ### Keypair
-First generate a keypair or copy your public key to the ssh
+First generate a keypair or copy your public key to the build
 directory and name it `gitweb_rsa`:
 
     rm -f gitweb_rsa.pub
