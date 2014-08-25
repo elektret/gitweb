@@ -3,21 +3,12 @@ MAINTAINER Manuel Bieling "manuel@elektret.de"
 WORKDIR ~/
 
 RUN apt-get update
-RUN apt-get install -y make \
-                       nginx \
+RUN apt-get install -y nginx \
                        fcgiwrap \
                        spawn-fcgi \
                        openssh-server \
-                       gcc \
-                       gettext \
-                       libcurl4-gnutls-dev libexpat1-dev \
-                       libz-dev libssl-dev
-
-# COMPILE GIT
-RUN curl -O https://www.kernel.org/pub/software/scm/git/git-2.1.0.tar.gz; \
-    tar -xvf git-2.1.0.tar.gz; \
-    make -C git-2.1.0 prefix=/usr all; \
-    make -C git-2.1.0 prefix=/usr install
+                       git \
+                       gitweb
 
 # CREATE USER
 RUN useradd -Umd /home/gitweb gitweb -s /bin/bash
@@ -27,12 +18,6 @@ RUN mkdir -p /var/run/sshd; \
     mkdir -p /var/www/gitweb; \
     mkdir -p /home/gitweb/repos; \
     mkdir -p /home/gitweb/.ssh
-
-RUN git clone git://git.kernel.org/pub/scm/git/git.git gitweb; \
-    make -C gitweb prefix=/usr gitweb; \
-    make -C gitweb gitwebdir=/var/www/gitweb install-gitweb; \
-    chown -R gitweb:gitweb /var/www; \
-    chown -R gitweb:gitweb /home/gitweb/repos
 
 # CHROOT
 RUN mkdir -p /home/gitweb/dev; \
@@ -83,6 +68,7 @@ RUN cp /lib64/ld-linux-x86-64.so.2 /home/gitweb/lib64/; \
     cp /lib/x86_64-linux-gnu/libattr.so.1 /home/gitweb/lib/x86_64-linux-gnu/; \
     cp /lib/x86_64-linux-gnu/libz.so.1 /home/gitweb/lib/x86_64-linux-gnu/; \
     cp /lib/x86_64-linux-gnu/libtinfo.so.5 /home/gitweb/lib/x86_64-linux-gnu/; \
+    cp /lib/x86_64-linux-gnu/libresolv.so.2 /home/gitweb/lib/x86_64-linux-gnu/; \
     cp /usr/lib/x86_64-linux-gnu/libcrypto.so.1.0.0 /home/gitweb/usr/lib/x86_64-linux-gnu/
 
 # NGINX
@@ -93,9 +79,18 @@ RUN ln -s /etc/nginx/sites-available/gitweb /etc/nginx/sites-enabled/; \
 # SSH
 ADD gitweb_rsa.pub /home/gitweb/.ssh/gitweb_rsa.pub
 RUN cat /home/gitweb/.ssh/gitweb_rsa.pub > /home/gitweb/.ssh/authorized_keys; \
-    chown -R gitweb:gitweb /home/gitweb/.ssh; \
-    chown root:root /home/gitweb; \
-    passwd -l root
+    passwd -l root; \
+    passwd -l gitweb
+
+# GITWEB
+RUN cp -r /usr/share/gitweb/static /var/www/gitweb/; \
+    cp /usr/share/gitweb/gitweb.cgi /var/www/gitweb/
+
+# ENV
+RUN chown -R gitweb:gitweb /home/gitweb/.ssh; \
+    chown -R gitweb:gitweb /var/www; \
+    chown gitweb:gitweb /home/gitweb/repos; \
+    chown root:root /home/gitweb
 
 # CONFIG
 ADD nginx.conf /etc/nginx/nginx.conf
