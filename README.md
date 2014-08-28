@@ -24,7 +24,7 @@ In `~/.ssh/config`, add your key:
 
 ### Build & run
 
-    docker build -t elektret/gitweb-small
+    docker build -t elektret/gitweb-small .
     docker run -dp 8080:80 -p 6060:22 --name some-gitweb elektret/gitweb-small
     
 ### Web interface
